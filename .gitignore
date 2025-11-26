@@ -5,6 +5,7 @@ out/
 .kotlin
 multiThreadingJava.iml
 *.xml
+TODO.md
 
 ### Eclipse ###
 .apt_generated

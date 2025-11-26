@@ -6,7 +6,7 @@ An operating system is a software program that manages computer hardware and sof
 
 ## What is a Core?
 
-A core is a single processor unit in a multi-core processor. Each core can execute instructions independently, allowing for parallel processing and improved performance.
+A core is a single processor unit in a multicore processor. Each core can execute instructions independently, allowing for parallel processing and improved performance.
 
 ## What is a Program?
 
@@ -18,7 +18,7 @@ A process is an instance of a program in execution. Each process has its own mem
 
 ## What is Multi-tasking?
 
-Multi-tasking refers to the ability of a computer to perform multiple tasks simultaneously. This can be achieved through the use of multiple processes or threads, each running independently and sharing resources as needed.
+Multitasking refers to the ability of a computer to perform multiple tasks simultaneously. This can be achieved through the use of multiple processes or threads, each running independently and sharing resources as needed.
 
 ## What is a Thread?
 
@@ -146,8 +146,113 @@ public class Main{
     public static void main(String[] args){
         Thread t1 = new MyThread();
         t1.setDaemon(true);
-        //when setDaemon is true then jvm will treat t1 as a low priority-thread and the program will terminate even if t1 is not finished(1s delay), if it's set to false then the program will wait for t1 to finish..
+        //when setDaemon is true then jvm will treat t1 as a low priority-thread 
+        // and the program will terminate even if t1 is not finished(1s delay), 
+        // if it's set to false then the program will wait for t1 to finish.
         t1.start();
     }
 }
 ```
+
+## Synchronization
+
+In certain scenarios, multiple threads may try to access a common resource and depending upon their relative timing the output of the program may differ
+this condition of the output depending upon which thread get resource access first is called `race condition`.
+
+to avoid this the easiest way is to apply some kind of lock on the resource such that at any particular time only one thread can access the resource,
+there are two types of locks:
+
+1. Implicit Lock
+2. Explicit Lock
+
+### What is Implicit Lock?
+
+Implicit Lock is a lock that is automatically acquired and released by the JVM. It is used to synchronize access to a shared resource.
+
+```java
+public class MyThread extends Thread{
+    @Override
+    public void run(){
+        synchronized (this){//this block is synchronized
+            System.out.println("My thread is running...");
+        }
+    }
+}
+```
+
+### What is Explicit Lock?
+
+Explicit Lock is a lock that is manually acquired and released by the programmer. It is used to synchronize access to a shared resource. It offers more control over the lock.(look for synchronization.locks.ReentrantLockExample for more details)
+
+```java
+public class MyThread extends Thread{
+    private final Lock lock = new ReentrantLock();
+    @Override
+    public void run(){
+        lock.lock();
+        try {
+            System.out.println("My thread is running...");
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+```
+
+### What are the advantages of Explicit Lock over Implicit Lock?
+
+- **Fairness:** Explicit locks (like `ReentrantLock`) can offer fair locking, meaning the longest-waiting thread gets the lock next or in the first come first serve basis. Implicit locks (synchronized blocks) do not guarantee fairness.
+
+- **Non-blocking attempts:** Explicit locks allow for `tryLock()`, which attempts to acquire the lock without blocking. This is useful for avoiding deadlocks or implementing more sophisticated concurrency control.
+
+- **Interruptible lock acquisition:** Explicit locks support `lockInterruptibly()`, allowing a thread waiting for a lock to be interrupted. `synchronized` blocks do not offer this.
+
+- **Multiple conditions:** Explicit locks can have multiple `Condition` objects associated with them, enabling more fine-grained control over thread waiting and notification. `synchronized` blocks only have a single wait-set per object.
+
+- **Time-out for lock acquisition:** Explicit locks allow you to specify a timeout when acquiring a lock using `tryLock(long timeout, TimeUnit unit)`, preventing indefinite waiting.
+
+### What are Read-Write Locks?
+
+Read-Write Locks are a type of lock that allows multiple threads to read a shared resource concurrently, but only one thread to write to the resource at a time.
+
+there's a class called `ReentrantReadWriteLock` that implements `ReadWriteLock` interface.
+
+```java
+public class MyThread extends Thread{
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+
+    private int count = 0;
+
+    @Override
+    public void run(){
+        lock.readLock().lock();//multiple threads can acquire the read lock simultaneously
+        try {
+            System.out.println("My thread is running...");
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    public void increment(){
+        lock.writeLock().lock();//only one thread can acquire the write lock
+        //read lock can only be acquired when no thread holds the write lock.
+        //The Write Lock can only be granted if no other thread currently holds either a Read Lock OR a Write Lock.
+        try {
+            count++;
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+}
+```
+
+## Deadlock
+
+Deadlock is a situation where two or more threads are blocked waiting for each other to release a lock.
+
+Deadlock typically happens when the below conditions are met:
+
+1. Mutual Exclusion: Only one thread can access a resource at a time.
+2. Hold and Wait: A thread is holding at least one resource and waiting for other resources that are being held by other threads.
+3. No Preemption: Resources cannot be forcibly taken away from a thread.
+4. Circular Wait: A set of threads are waiting for resources in a circular fashion.
