@@ -256,3 +256,15 @@ Deadlock typically happens when the below conditions are met:
 2. Hold and Wait: A thread is holding at least one resource and waiting for other resources that are being held by other threads.
 3. No Preemption: Resources cannot be forcibly taken away from a thread.
 4. Circular Wait: A set of threads are waiting for resources in a circular fashion.
+
+## What is Executors framework?
+
+Executors framework is a framework that provides a way to create and manage threads in a Java application.
+
+## What is the difference between Runnable and Callable?
+
+Runnable is an interface that is used to define a task that can be executed by a thread. Callable is an interface that is used to define a task that can be executed by a thread and returns a result.
+
+Runnable does not return a result and does not throw a checked exception. Callable returns a result and throws a checked exception.
+
+Runnable has a method called `run()` and Callable has a method called `call()`. Callable is a subinterface of Runnable.
