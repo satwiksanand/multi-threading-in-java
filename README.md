@@ -268,3 +268,18 @@ Runnable is an interface that is used to define a task that can be executed by a
 Runnable does not return a result and does not throw a checked exception. Callable returns a result and throws a checked exception.
 
 Runnable has a method called `run()` and Callable has a method called `call()`. Callable is a subinterface of Runnable.
+
+## What is the difference between CountDownLatch and CyclicBarrier?
+
+CountDownLatch is a synchronization aid that allows one or more threads to wait until a set of operations being performed in other threads completes.
+CyclicBarrier is a synchronization aid that allows a set of threads to wait for each other to reach a common barrier point.
+
+CountDownLatch is used when a thread needs to wait for other threads to finish their tasks before it can proceed.
+CyclicBarrier is used when a set of threads need to wait for each other to reach a common barrier point before they can proceed.
+
+CountDownLatch is a one-time use synchronization aid.
+CyclicBarrier is a reusable synchronization aid.
+
+## What is CompletableFuture?
+
+CompletableFuture is a class that implements the `Future` interface and provides a way to execute tasks asynchronously.
